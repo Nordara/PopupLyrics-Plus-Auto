@@ -3,7 +3,8 @@
 
 *Auto detect language and option to show both original and translation*
 
-<img width="429" height="243" alt="image" src="https://github.com/user-attachments/assets/f30f54dc-b7e7-4b9b-b4d2-517251a8b802" />
+<img width="731" height="279" alt="image" src="https://github.com/user-attachments/assets/2c2d6192-707e-438f-97a3-5abb2e76d752" />
+
 
 *Chinese translation*
 
