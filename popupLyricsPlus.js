@@ -908,6 +908,30 @@ function PopupLyrics() {
       navigator.mediaSession.setActionHandler("nexttrack", () => {
         Spicetify.Player.next();
       });
+
+      // Seek bar (timeline) di jendela PiP -> Spicetify.Player.seek(ms)
+      navigator.mediaSession.setActionHandler("seekto", (details) => {
+        if (typeof details.seekTime === "number") {
+          // seekTime dalam detik, Player.seek() butuh milidetik
+          Spicetify.Player.seek(details.seekTime * 1000);
+        }
+      });
+
+      // Seek maju/mundur (tombol +/- 10 detik di PiP)
+      navigator.mediaSession.setActionHandler("seekbackward", (details) => {
+        const offset = (details.seekOffset || 10) * 1000;
+        Spicetify.Player.seek(
+          Math.max(0, Spicetify.Player.getProgress() - offset),
+        );
+      });
+
+      navigator.mediaSession.setActionHandler("seekforward", (details) => {
+        const offset = (details.seekOffset || 10) * 1000;
+        const target = Spicetify.Player.getProgress() + offset;
+        Spicetify.Player.seek(
+          Math.min(Spicetify.Player.getDuration(), target),
+        );
+      });
     } catch (error) {
       console.error("MediaSession error:", error);
     }
@@ -1661,6 +1685,18 @@ function PopupLyrics() {
       currentTime: (Player.getProgress() - Number(options.delay)) / 1000,
       duration: Player.getDuration() / 1000,
     };
+
+    // Sinkronkan posisi ke jendela PiP: seek bar bergerak & badge "LIVE" hilang
+    if ("mediaSession" in navigator && audio.duration > 0) {
+      try {
+        const pos = Player.getProgress() / 1000;
+        navigator.mediaSession.setPositionState({
+          duration: audio.duration,
+          position: Math.min(Math.max(pos, 0), audio.duration),
+          playbackRate: 1,
+        });
+      } catch (e) {}
+    }
 
     const { error, lyrics } = sharedData;
 
